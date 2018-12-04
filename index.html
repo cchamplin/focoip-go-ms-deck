@@ -1,0 +1,871 @@
+<html lang="en-US">
+<head>
+	<title>Scalable Microservices in Go - FOCO IP Dec 2018</title>
+	<link rel="stylesheet" href="lib/css/reveal.css">
+	<link rel="stylesheet" href="lib/css/theme/sky.css">
+	<link rel="stylesheet" href="lib/css/zenburn.css"/>
+	<script src="lib/lib/js/head.min.js"></script>
+	<style>.asterisk:before { content: "*"; }
+	.morespace li {
+		margin: 1em auto;
+	}
+	.morespace li:first-child {
+		margin: 0em 0em 1em 0em;
+	}
+	.bigspace li {
+		margin: 2em auto;
+	}
+	.bigspace li:first-child {
+		margin: 0em 0em 2em 0em;
+	}
+
+	.left {
+		text-align:left;
+	}
+
+  .reveal .slides section .fragment.grow-current.current-fragment {
+	   opacity: 1;
+	   visibility: inherit;
+  }
+	.reveal .slides section .fragment.grow-current.current-fragment.visible {
+		transform: scale( 1.3 );
+	}
+  .reveal .slides section .fragment.highlight-current-green.current-fragment span {
+	   color: #17ff2e;
+  }
+  .reveal .slides section .fragment.highlight-current-green.current-fragment span span {
+	   color: #17ff2e;
+   }
+
+	.nostyle ul,
+	.nostyle li {
+		list-style:none
+	}
+
+	.presentation .fit ul {
+		font-size: 1em;
+	}
+
+	.presentation .fit.small ul {
+		font-size: 0.8em;
+	}
+
+	.presentation .fit ul li {
+		margin-bottom: 0.5em;
+		font-size: 0.80em;
+	}
+
+	.presentation .fit.space ul li {
+		margin-bottom: 1em;
+	}
+
+
+	.somespace li {
+		margin: 0.60em auto;
+	}
+	.somespace li:first-child {
+		margin: 0em 0em 0.60em 0em;
+	}
+
+	.nospace li {
+		margin: 0 0 0 0;
+	}
+	.nospace li:first-child {
+		margin: 0 0 0 0;
+	}
+
+	.presentation h3.smaller,
+	.presentation ul.smaller,
+	.presentation b.smaller {
+		font-size: 1.25em;
+	}
+
+	.presentation h3.even-smaller,
+	.presentation ul.even-smaller,
+	.presentation b.even-smaller {
+		font-size: 1.0em;
+	}
+
+	.presentation h3.real-small,
+	.presentation ul.real-small,
+	.presentation b.real-small {
+		font-size: 0.75em;
+	}
+
+	.presentation h3.tiny,
+	.presentation ul.tiny {
+		font-size: 0.45em;
+	}
+
+	.presentation pre.noformat {
+		box-shadow: 0 0;
+	}
+
+	.presentation pre.smaller {
+		font-size: 0.45em;
+	}
+
+	.presentation pre.nobox {
+		margin: 0 auto;
+	}
+	</style>
+	<script>
+	var link = document.createElement( 'link' );
+	link.rel = 'stylesheet';
+	link.type = 'text/css';
+	link.href = window.location.search.match( /print-pdf/gi ) ? 'lib/css/print/pdf.css' : 'lib/css/print/paper.css';
+	document.getElementsByTagName( 'head' )[0].appendChild( link );
+</script>
+</head>
+<body>
+	<div class="reveal presentation">
+		<div class="slides">
+			<section>
+				<div>
+					<h2>Building Scalable Microservices with Go</h2>
+					<br/><br/>
+					<p>Live Deck: <a href="https://deck.nullocated.com/fcip">https://deck.nullocated.com/fcip</a></p>
+					<p>Deck Source:<br/> <a href="https://github.com/cchamplin/focoip-go-ms-deck">https://github.com/cchamplin/focoip-go-ms-deck</a></p>
+				</div>
+				</section>
+				<section style="top:0; position:relative;">
+					<div style="margin-top: 35px;display:flex; flex-direction: column; height: 100%;">
+						<div style="height: 64px; flex: 0 0 auto;text-align:center"><span style="font-size:0.85em;opacity: 0.3;">Software Engineer | Hobbyist | Devops | Climber | Traveler</span></div>
+						<div style="flex: 1 1 auto">
+							<h3>Who is this person?</h3>
+							<br/><span style="font-size:1.2em;color:rgba(31, 150, 58, 0.78);">Caleb Champlin</span><br/><br/><br/>
+							<ul style="list-style:none;">
+								<li><img src="lib/img/email.png" style="border:none;box-shadow:none; background:transparent; margin: 0 15px 0 0; display:inline-block" />caleb.champlin@gmail.com</li>
+								<li><a href="https://github.com/cchamplin"><img src="lib/img/github.png" style="border:none;box-shadow:none;background:transparent;margin: 0 15px 0 0;display:inline-block"/>github.com/cchamplin</a></li>
+							</ul><br/><br/>
+							<ul style="list-style: none; font-size: 0.5em;">
+								<li style="list-style:none;" class="asterisk">The type of person that has 500+ tabs open in Chrome</li>
+							</ul>
+						</div>
+						<div style="height: 64px;margin-bottom: 1em; flex: 0 0 auto;text-align:center"><span style="font-size:0.85em; opacity:0.3">Beer Lover | Educator | Contributor | Outdoor Enthusiast</span></div>
+					</div>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						## What's Covered
+
+						* Introduction to Microservices
+						* Microservice patterns in Go
+						* What adopting microservices architecture looks like
+						* How to scale effectively
+					</textarea>
+				</section>
+				<section>
+					<img style="width: 65%; height:50%; border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/monolithic-vs-ms.png" />
+					<p>
+						<h3>Microservices</h3>
+						<ul>
+							<li>Can solve a lot of problems, but present their own challenges</li>
+						</ul>
+					</p>
+				</section>
+				<section class="fit">
+					<p>
+						<h3>Microservices</h3>
+						<div>
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/amazon-icon.png" />
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/spotify-icon.png" />
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/uber-icon.jpg" />
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/paypal-icon.png" />
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/netflix-icon.png" />
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/groupon-icon.png" />
+							<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px;" src="lib/img/soundcloud-icon.png" />
+						</div>
+					</p>
+				</section>
+				<section class="fit">
+					<p>
+						<h3 class="left">Microservices (the good)</h3>
+						<ul>
+							<li>Can help break up teams and make working on large sets of code easier</li>
+							<li>Help the organization move faster</li>
+							<li>Usually fundamentally easier to reason about</li>
+							<li>Can make handling load considerably easier (this is a misnomer, scaling is never "easy")</li>
+						</ul>
+					</p>
+				</section>
+				<section class="fit">
+					<p>
+						<h3  class="left">Microservices (the challenges)</h3>
+						<ul>
+							<li>Need a lot of planning</li>
+							<li>Convolute sharing resources, databases, work boundaries</li>
+							<li>Scaling requires LOTS of infrastructure, expertise, and trial and error</li>
+							<li>Things now have to talk to each other, this is harder than it sounds</li>
+						</ul>
+					</p>
+				</section>
+				<section>
+					<h3 class="left smaller">Microservices (challenges cont.)</h3>
+					<div>
+						<div style="width:50%;float:left;">
+							<ul class="real-small morespace">
+								<li>Debugging services working in conjunction can be a nightmare</li>
+								<li>Everything is decentralized - logging, testing, monitoring and tracing</li>
+								<li>Your security surface area goes way up</li>
+							</ul>
+						</div>
+						<div style="width:50%;float:left;">
+							<img style="height:50%; border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/wires.jpg" />
+						</div>
+					</div>
+				</section>
+				<section>
+					<div>
+						<img src="lib/img/ms-complexity-go.png" style="border:none; background:transparent; box-shadow:none; margin:0 auto;" />
+					</div>
+				</section>
+				<section>
+					<p>
+						<h3 style="display:none">Go</h3>
+						<img style="border:none; background:transparent; box-shadow:none; margin:0 auto; height: 25%;" src="lib/img/golang.png" />
+						<ul style="margin-top: 1em;">
+							<li>Go originated out of Google</li>
+							<li>Highly opinionated (idiomatic)</li>
+							<li>C style(ish)</li>
+						</ul>
+					</p>
+				</section>
+				<section>
+					<p>
+						<h3>More on go</h3>
+						<ul class="nostyle morespace real-small">
+							<li>Statically typed and compiled, it has a runtime and a garbage collector but no VM (so its not like Java)</li>
+						</ul>
+						<div>
+							<img style="border:none; background:transparent; box-shadow:none; float:left;" src="lib/img/cowboy-color.png" />
+							<div style="float:right; margin-top:1em; text-align:left">
+								Binaries have the whole runtime<br/><br/>
+								No JIT (re)compilation<br/><br/>
+								Managed memory (GC)
+							</div>
+						</div>
+					</p>
+				</section>
+				<section>
+					<p>
+						<h3>More on go</h3>
+						<ul class="nostyle morespace real-small">
+							<li>Lots of concurrency primitives are language features</li>
+						</ul>
+						<div style="margin-top: 1em;" class="stretch">
+							<img style="border:none; background:transparent; box-shadow:none; float:right;" src="lib/img/go-channel.jpg" />
+							<div>
+								<p>Goroutines == Run asynchronous + Thin Threads</p>
+							</div>
+						</div>
+					</p>
+				</section>
+				<section>
+					<p>
+						<h3>More on go</h3>
+						<ul class="stretch nostyle morespace real-small">
+							<li>Can come pretty close to C efficiency if you're doing thing idiomatically</li>
+						</ul>
+						<div>
+							<img style="height:50%; border:none; background:transparent; box-shadow:none;" src="lib/img/gofast.png" />
+						</div>
+					</p>
+				</section>
+				<section>
+					<p>
+						<h3>More on go</h3>
+						<ul class="nostyle morespace real-small">
+							<li>Go is pretty adverse to "magic"</li>
+						</ul>
+
+						<div style="margin-top: 1em;">
+							<img style="margin-top:-3em; float:left; border:none; background:transparent; box-shadow:none;" src="lib/img/wizard_gopher.png" />
+							<div style="float:right;width:50%">
+								Clean Code!
+								<pre class="noformat smaller nobox">
+									<code class="go golang" data-trim data-noescape>
+										func main() {
+											for {
+												conn := in.accept()
+												go handle_conn(conn)
+											}
+										}
+									</code>
+								</pre>
+							</div>
+						</div>
+					</p>
+				</section>
+				<section>
+					<h3 class="smaller">How do I start?</h3>
+					<div>
+						<div style="width:50%;float:left;">
+							<ul class="real-small morespace">
+								<li>Play around</li>
+								<li>Start small with distinct parts</li>
+								<li>You'll want to use a framework</li>
+							</ul>
+						</div>
+						<div style="width:50%;float:left;">
+							<img style="height:50%; border:none; background:transparent; box-shadow:none; float:right;" src="lib/img/just_do_it.png" />
+						</div>
+					</div>
+				</section>
+				<section >
+					<h3>Keep it simple</h3>
+					<ul class="somespace real-small">
+						<li>Focus on the business logic your service should be performing</li>
+						<li>If you're spending a bunch of time developing a really complex logging framework for each of your services, you're doing it wrong</li>
+						<li>Don't roll your own:
+							<ul class="nospace">
+								<li>Databases</li>
+								<li>Service Discovery</li>
+								<li>Tracing</li>
+								<li>Cryptography</li>
+								<li>*Consensus Algorithms*</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Building Services in Go</h3>
+					<ul class="morespace">
+						<li>Some of the available frameworks/toolkits:
+							<ul>
+								<li>Go-Kit</li>
+								<li>Micro</li>
+								<li>gizmo</li>
+								<li>Kite</li>
+							</ul>
+						</li>
+					</ul>
+					<div style="float:right; margin-top: -375px; width: 60%;">
+						<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px; width: 128px; height: 128px;" src="lib/img/gokit-logo-header.png" />
+						<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px; width: 128px; height: 128px;" src="lib/img/gizmo.png" />
+						<img style="border:none; background:transparent; box-shadow:none; margin: 15px 30px; width: 128px; height: 128px;" src="lib/img/kite.png" />
+					</div>
+				</section>
+				<section data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						## Go-Kit
+
+						* Nice things out of the box:
+							* Middleware
+							* Circuitbreaking
+							* Tracing
+							* Logging
+							* Metric
+					</textarea>
+				</section>
+				<section>
+					<h3 class="smaller">Patterns: Services</h3>
+					<pre class="noformat smaller">
+						<code class="go golang" data-trim data-noescape>
+							<span class="fragment highlight-current-green">type Service interface</span> {
+								<span class="fragment highlight-current-green">ScheduleNewFlight</span>(ctx context.Context,
+								routeNumber route.RouteNumber) (flight.FlightID, error)
+
+								<span class="fragment highlight-current-green">LoadFlight</span>(ctx context.Context, id flight.FlightID) (Flight, error)
+
+								<span class="fragment highlight-current-green">RequestFlightsForDate</span>(ctx context.Context,
+								originAirportID airport.AirportCode,
+								destinationAirportID airport.AirportCode,
+								date time.Time) ([]Flight, error)
+
+								<span class="fragment highlight-current-green">CancelFlight</span>(ctx context.Context, id flight.FlightID) error
+
+								<span class="fragment highlight-current-green">Flights</span>(ctx context.Context) []Flight
+
+							}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h3 class="smaller">Patterns: Middleware</h3>
+					<pre class="noformat smaller nobox">
+						<code class="go golang" data-trim data-noescape>
+							<span class="fragment highlight-current-green">var fms Service</span>
+							<span class="fragment highlight-current-green"><mark>fms</mark> = services.NewService(flights.db)</span>
+							<span class="fragment highlight-current-green"><mark>fms</mark> = services.NewLoggingService(log.With(logger, "component","flightmanager"), <mark>fms</mark>)</span>
+							<span class="fragment highlight-current-green"><mark>fms</mark> = services.NewInstrumentingService(..., <mark>fms</mark>)</span>
+						</code>
+					</pre>
+					<pre class="noformat smaller nobox">
+						<code class="go golang" data-trim data-noescape>
+							type loggingService struct {
+								logger log.Logger
+								Service
+							}
+							func NewLoggingService(logger log.Logger, s Service) Service {
+								return &loggingService{logger, s}
+							}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h3 style="margin:10px 0 0 0;" class="even-smaller">Patterns: Middleware</h3>
+					<b class="real-small">Instrumenting/Metrics</b>
+					<pre style="margin-bottom:-2em;" class="noformat smaller nobox">
+						<code class="go golang" data-trim data-noescape>
+							func <span class="fragment highlight-current-green" data-fragment-index="2">(s *instrumentingService)</span> <span class="fragment grow-current highlight-current-green" data-fragment-index="1">ScheduleNewFlight</span>(ctx context.Context, ...) (...) {
+								<span class="fragment highlight-current-green" data-fragment-index="4">defer func(begin time.Time) {
+									s.requestCount.With("method", "schedule").Add(1)
+									s.requestLatency.With("method", "schedule").Observe(time.Since(begin))
+								}(time.Now())</span>
+
+								return <span class="fragment highlight-current-green" data-fragment-index="3">s.Service.ScheduleNewFlight(ctx, routeNumber)</span>
+							}
+						</code>
+					</pre>
+					<b class="real-small">Logging</b>
+					<pre class="noformat smaller nobox">
+						<code class="go golang" data-trim data-noescape>
+							func <span class="fragment highlight-current-green" data-fragment-index="6">(s *loggingService)</span> <span class="fragment highlight-current-green" data-fragment-index="5">ScheduleNewFlight</span>(ctx context.Context, ...) (...) {
+								<span class="fragment highlight-current-green" data-fragment-index="8">defer func(begin time.Time) {
+									s.logger.Log(
+									"method", "schedule_flight",
+									"route_number", routeNumber,
+									"took", time.Since(begin),
+									)
+								}(time.Now())</span>
+
+								return <span class="fragment highlight-current-green" data-fragment-index="7">s.Service.ScheduleNewFlight(ctx, routeNumber)</span>
+							}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h3 class="smaller">Patterns: Circuitbreaking</h3>
+					<pre style="margin-bottom:-2em;" class="noformat smaller nobox">
+						<code class="go golang" data-trim data-noescape>
+							return func(next endpoint.Endpoint) endpoint.Endpoint {
+								return func(ctx context.Context, request interface{}) (response...) {
+									var resp interface{}
+									if err := <span class="fragment highlight-current-green">hystrix.Do("get-passengers", func() (err error) {</span>
+										resp, err = next(ctx, request)
+										return err
+									}, func(err err) {
+										// Do this as a fallback if the request
+										// fails or times out.
+										<span class="fragment highlight-current-green">logger.Log("fallback-cause", err.Error())
+										<mark>resp, err = responseFromStaleCache(ctx, request)</mark></span>
+										return err
+									}); err != nil {
+										return nil, err
+									}
+									return resp, nil
+								}
+							}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h3 class="smaller">Patterns: Tracing</h3>
+					<pre style="margin-bottom:-2em;" class="noformat smaller nobox">
+						<code class="go golang" data-trim data-noescape>
+							func (s *tracingService) ScheduleNewFlight(ctx context.Context, ...) (...) {
+								<span class="fragment highlight-current-green" data-fragment-index="1">span, _ := s.tracer.StartSpanFromContext(ctx, "LoadRoute")</span>
+								<span class="fragment highlight-current-green" data-fragment-index="3">defer span.Finish()</span>
+
+								return <span class="fragment highlight-current-green" data-fragment-index="2">s.Service.ScheduleNewFlight(ctx, routeNumber)</span>
+							}
+
+						</code>
+					</pre>
+					<img style="" src="lib/img/zipkin.png" />
+				</section>
+				<section>
+					<h3 class="smaller">Patterns: Return Fast</h3>
+					<pre style="tab-size: 2; margin-bottom:-2em;" class="noformat smaller nobox">
+						<code class="go golang" style="max-height: 475px" data-trim data-noescape>
+							func (s *Service) SaveToCache(ctx context.Context, ...) (...) {
+								<span class="fragment highlight-current-green">confirmations := make(chan bool)</span>
+								<span class="fragment highlight-current-green">totalConfirmations := 0</span>
+
+								// Async replicate data to three caches
+								<span class="fragment highlight-current-green">go replicateToCache(confirmations, responseData, 3)</span>
+								<span class="fragment highlight-current-green">timeout := time.After(3 * time.Second)</span>
+								// Wait until we have two confirmations
+								for {
+									select {
+										<span class="fragment highlight-current-green">case <-confirmations:</span>
+										totalConfirmations += 1
+										<span class="fragment highlight-current-green">if totalConfirmations >= 2 {
+											// Return before replications have completed, we have at least two
+											// the third will still happen, we just don't need to wait
+											return ..., nil
+										}</span>
+										case <-timeout:
+										return ..., errors.New(...)
+									}
+								}
+							}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h3 class="smaller">Patterns: Feature Flags</h3>
+					<pre style="tab-size: 2; margin-bottom:-2em;" class="noformat smaller nobox">
+						<code class="go golang" style="max-height: 475px" data-trim data-noescape>
+							func (s *flaggedService) ScheduleNewFlight(ctx context.Context, ...) (...) {
+								if <mark>s.HasFlag("use-new-scheduler")</mark> {
+									return s.Service.ScheduleNewFlightV2(ctx, routeNumber, ...)
+								} else {
+									return s.Service.ScheduleNewFlight(ctx, routeNumber)
+								}
+							}
+						</code>
+					</pre>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						## Best Practices
+
+						* Leverage go language features
+							* Go routines
+							* Channels
+							* Composability
+						* Fail fast and early so you don't fail hard
+						* Use feature flags
+						* Tracing can be really hard but provides immeasurable value
+					</textarea>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Service Development Best Practices
+
+						* Build and Run
+						* Mock service dependencies to make testing easier
+						* Self-contained for testing
+					</textarea>
+				</section>
+				<section class="fit space" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Common Pitfalls
+
+						* Queues are dangerous
+						* Channels aren't free
+						* Always acknowledge the possibility of language or runtime bugs, maybe it's not you!
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						## Microservices Adoption and Growth
+						![Through the ages](lib/img/ages.jpg)
+					</textarea>
+				</section>
+				<section>
+					<h3>Epoch</h3>
+					<div>
+						<div style="width:50%;float:left;">
+							<img style="margin: 0 auto; border:none; background:transparent; box-shadow:none;" src="lib/img/helloworld.png" />
+						</div>
+						<div style="width:50%;float:left;">
+							<ul class="real-small morespace">
+								<li>Experimental microservices, not a lot of complexity upfront</li>
+								<li>Start small and with distinct parts</li>
+								<li>Identify your domain context boundaries</li>
+								<li>Start to develop your API</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:">
+						### Unification
+						* Revise scope and boundaries, really start thinking about what each service is going to do
+						* Logging becomes important
+						* Continue experimenting with how services are going to communicate
+						* Start developing shared components (logging, network, concurrency, database abstraction)
+						* Move to less languages (one if possible)
+					</textarea>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:">
+						### Solidify
+						* Set your API in stone, use API versioning
+						* Set your "protocols" in stone - Rest/Protobufs
+						* Start thinking about metrics for individual services
+						* Documentation becomes increasing important
+						* Determine what your testing situation is going to look like
+					</textarea>
+				</section>
+				<section>
+					<h3>Diving into scaling</h3>
+					<div>
+						<div style="float:right; width:30%;">
+							<img style="margin: 0 auto; border:none; background:transparent; box-shadow:none;" src="lib/img/regret.jpg" />
+						</div>
+						<div style="">
+							<ul style="display: block" class="real-small morespace">
+								<li>Start running multiple instances of services, likely manually scheduling</li>
+								<li>Start experiencing performance issues and debugging, bottle necks</li>
+								<li>Build pipelines</li>
+								<li>Regret every decision you've ever made in life</li>
+								<li>Replace components as necessary, use pre-vetted third party projects, figure out dependency management that works for you</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section>
+					<div>
+						<div style="float:left; width:30%;">
+							<h3 class="smaller">Full speed ahead</h3>
+							<ul class="tiny">
+								<li style="list-style:none;">(If 10 services is good, 100 services should be great!)</li>
+							</ul>
+						</div>
+						<div style="float:left; width: 70%;">
+							<ul style="display: block" class="morespace real-small">
+								<li>Service discovery</li>
+								<li>Aggregation of everything and all the infrastructure that requires
+									<ul>
+										<li>Logs, Metrics, Monitoring Data, Alerting, and People Management</li>
+									</ul>
+								</li>
+								<li>Redundancy for Everything
+									<ul>
+										<li>Build pipelines, Service discovery, Deployments, People, Scheduling</li>
+									</ul>
+								</li>
+								<li>Scaling dozens or hundreds of services and nodes across servers</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3 class="even-smaller">Regret</h3>
+					<div>
+						<div style="float:left; width:70%;">
+							<ul style="width:90%" class="real-small morespace">
+								<li>Scaling hundreds or thousands of nodes across data centers</li>
+								<li>Terms like "fire-hose", "cascading-failure", "partition/fault tolerance" are every day phrases</li>
+								<li><b>"Microservices are stupid"</b></li>
+								<li>Simulating failures at scale</li>
+								<li>Redesigns of entire sets of services</li>
+								<li>$$$ you're either making lots of it or setting it on fire.</li>
+							</ul>
+						</div>
+						<div style="float:left; width:30%;">
+							<img style="float:right; margin-top: 2em; height:50%; width: 100%; border:none; background:transparent; box-shadow:none;" src="lib/img/yolo.gif" />
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3 class="even-smaller">Enlightenment</h3>
+					<div>
+						<div style="float:left; width:30%;">
+							<img style="margin: 0 auto; border:none; background:transparent; box-shadow:none;" src="lib/img/enlightened.jpg" />
+							<ul style="margin-top:2em;" class="tiny">
+								<li style="list-style:none">I Am Woke</li>
+								<li style="list-style:none">#Woke</li>
+								<li style="list-style:none">#Microservices4Life</li>
+							</ul>
+						</div>
+						<div style="float:left; width:70%;">
+							<ul style="width:90%" class="real-small morespace">
+								<li>Outages happen but only because of extreme edge cases</li>
+								<li>Lots of things are becoming managed</li>
+								<li>Everything is big picture, single failures are typically discarded</li>
+								<li>$$$ You're making lots of it or it doesn't matter how much of it you're burning because "investors"</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3>Architecture</h3>
+					<div>
+						<img src="lib/img/ms-complexity.png" style="height: 75%; border:none; background:transparent; box-shadow:none; margin:0 auto;" />
+					</div>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Architecture Decisions
+
+						* "Outsource" software whenever you can:
+							* Key-Value Database (<b>etcd</b>)
+							* Configuration Management (<b>etcd</b>, <b>zookeeper</b>)
+							* Cache (<b>redis</b>, <b>memcached</b>)
+							* Database (<b>Postgres</b>, <b>sqlite</b> [internal testing])
+							* Service discovery (<b>etcd</b>, <b>consul</b>, <b>eureka</b>)
+							* Scheduling (<b>Kubernetes</b>)
+					</textarea>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Architecture Decisions
+
+						* Tools of the trade to help you grow efficiently
+							* Use Docker and existing container images to spin up components fast
+							* ELK (Elasticsearch, Logstash, Kibana) [Logging]
+							* Pagerduty is great for alerts and notification [Alerts/Notifications]
+							* Prometheus or Graphite for metrics
+							* Zipkin for tracing
+					</textarea>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						## Best Practices
+
+						* Don't roll your own if you don't have to
+						* Use configuration management
+						* Always load test after making major scaling adjustments
+						* Design services to "fan out"
+					</textarea>
+				</section>
+				<section class="center-content fit" data-markdown data-background-image="lib/img/microservices.gif" data-background-size="contain">
+					<textarea data-template data-separator-notes="^Note:"  >
+					</textarea>
+				</section>
+				<section class="fit space" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Bad Assumptions
+
+						* Network congestion and contention is a real thing
+						* The network is NOT reliable
+						* Processes have overhead
+						* Don't underestimate the monetary cost of running services
+					</textarea>
+				</section>
+				<section class="fit space" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Common pitfalls
+
+						* Scaling can be dangerous
+						* Not accounting for uniqueness of services
+					</textarea>
+				</section>
+				<section class="fit space">
+					<h3>Scaling Gone Wrong</h3>
+					<p>
+						<img style="width:60%; border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/caching-initial.png" />
+					</p>
+				</section>
+				<section class="fit space">
+					<h3>Scaling Gone Wrong</h3>
+					<p>
+						<img style="height:70%; border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/caching-misses.png" />
+					</p>
+				</section>
+				<section class="fit space">
+					<h3>Scaling Gone Wrong: Fixed</h3>
+					<p>
+						<img style="height: 70%; border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/caching-balanced.png" />
+					</p>
+				</section>
+				<section data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Service diversity
+
+						* Not all services are going to behave the same
+						* Different load profiles
+						* Different system requirements
+						* This makes scaling difficult
+					</textarea>
+				</section>
+				<section class="fit space">
+					<h3>Bin-Packing</h3>
+					<p>
+						<img style="border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/bin-packing.png" />
+					</p>
+				</section>
+				<section class="fit space">
+					<h3>Bin-Packing</h3>
+					<p>
+						<img style="border:none; background:transparent; box-shadow:none; margin:0 auto;" src="lib/img/bin-packing2.png" />
+					</p>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						## Final Thoughts
+						### Scaling
+
+						* Use different protocols for external clients vs internal service communication
+						* Leverage caching whenever possible
+						* Avoid database touches whenever possible
+					</textarea>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Scaling
+
+						* Design services to handle dependency failures
+						* Design services with the ability to run in a degraded mode
+						* Take the time to bake in and leverage back-offs, rate limiting, auto-scaling
+					</textarea>
+				</section>
+				<section class="fit" data-markdown>
+					<textarea data-template data-separator-notes="^Note:"  >
+						### Recap
+
+						* Make use of design patterns and existing frameworks/toolkits to get started
+						* Architectures grow and change over time
+						* Plan!
+					</textarea>
+				</section>
+				<section>
+					<div>
+						<h3>Scalable Microservices in Go</h3>
+						<br/><br/>
+						<p>Deck Source:<br/> <a href="https://github.com/cchamplin/fcip">https://github.com/cchamplin/focoip-go-ms-deck</a></p>
+					</div>
+				</section>
+			</div>
+		</div>
+		<div style="position: absolute; top: 0px; margin-left: 0px; width: 100%; background-color:#fff; filter:alpha(opacity=5); opacity:0.5; border-color:#000000;">
+			<div style="float:right; font-size: 1.5em; margin: 10px 1em;">Fort Collins Internet Pros<br/>Fort Collins - Dec 2018</div>
+		</div>
+		<script src="lib/js/reveal.js"></script>
+		<script>
+		Reveal.initialize({
+			multiplex: {
+        "secret": null,
+        "id": "0fbd0bdfce1f1a91",
+        "url": "https://deck.nullocated.com:8080"
+      },
+			dependencies: [
+				// Interpret Markdown in <section> elements
+				{
+					src: 'lib/js/plugin/markdown/marked.js',
+					condition: function() {
+						return !!document.querySelector('[data-markdown]');
+					}
+				},
+				{
+					src: 'lib/js/plugin/markdown/markdown.js',
+					condition: function() {
+						return !!document.querySelector('[data-markdown]');
+					}
+				},
+				{
+					src: 'lib/js/plugin/highlight/highlight.js',
+					async: true,
+					callback: function() {
+						hljs.initHighlightingOnLoad();
+					}
+				},
+				{ src: 'lib/js/plugin/notes/notes.js', async: true },
+				{
+					"src": "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js",
+					async: true
+				},
+				{ "src" : "lib/js/plugin/multiplex/client.js ", async: true}
+			]
+		});
+		</script>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112740049-1"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+		gtag('js', new Date());
+
+		gtag('config', 'UA-112740049-1');
+	</script>
+</body>
+
+</html>
